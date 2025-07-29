@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Plan - DSA Study Planner</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="fas fa-code me-2"></i>DSA Study Planner
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a href="/dashboard" class="nav-link">
+                    <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                </a>
+                <a href="/topics" class="nav-link">
+                    <i class="fas fa-list-check me-1"></i>Topics
+                </a>
+                <button id="logoutBtn" class="btn btn-outline-secondary btn-sm ms-2">
+                    <i class="fas fa-sign-out-alt me-1"></i>Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Loading State -->
+        <div id="loadingState" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3 text-muted">Loading your study plan...</p>
+        </div>
+
+        <!-- No Plan State -->
+        <div id="noPlanState" class="d-none">
+            <div class="row justify-content-center">
+                <div class="col-lg-6 text-center">
+                    <div class="card">
+                        <div class="card-body py-5">
+                            <i class="fas fa-calendar-plus fa-4x text-muted mb-4"></i>
+                            <h3>No Study Plan Found</h3>
+                            <p class="text-muted mb-4">
+                                You don't have an active study plan yet. Start by selecting your topics and rating your skills.
+                            </p>
+                            <a href="/topics" class="btn btn-primary">
+                                <i class="fas fa-arrow-right me-1"></i>Select Topics
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div id="mainContent" class="d-none">
+            <!-- Plan Header -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card plan-header">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h2 class="mb-2">
+                                        <i class="fas fa-calendar-alt text-primary me-2"></i>
+                                        Your 7-Day DSA Study Plan
+                                    </h2>
+                                    <p class="text-muted mb-0" id="planDescription">
+                                        Personalized study plan generated using greedy algorithms
+                                    </p>
+                                </div>
+                                <div class="col-md-4 text-md-end">
+                                    <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end">
+                                        <button id="exportBtn" class="btn btn-outline-primary">
+                                            <i class="fas fa-download me-1"></i>Export Plan
+                                        </button>
+                                        <button id="regenerateBtn" class="btn btn-success">
+                                            <i class="fas fa-sync-alt me-1"></i>Regenerate
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Plan Statistics -->
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="card stat-card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-book-open fa-2x text-primary mb-2"></i>
+                            <h4 id="totalTopics" class="mb-1">0</h4>
+                            <small class="text-muted">Topics</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card stat-card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-clock fa-2x text-success mb-2"></i>
+                            <h4 id="totalTime" class="mb-1">0h</h4>
+                            <small class="text-muted">Study Time</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card stat-card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-calendar-day fa-2x text-warning mb-2"></i>
+                            <h4 class="mb-1">7</h4>
+                            <small class="text-muted">Days</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card stat-card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-calendar-check fa-2x text-info mb-2"></i>
+                            <h4 id="generatedDate" class="mb-1">-</h4>
+                            <small class="text-muted">Generated</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Study Plan -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-calendar-week me-2"></i>Daily Schedule
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="dailySchedule">
+                                <!-- Daily schedule will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js';
+
+        const firebaseConfig = {
+            apiKey: "{{ firebase_api_key }}",
+            authDomain: "{{ firebase_project_id }}.firebaseapp.com",
+            projectId: "{{ firebase_project_id }}",
+            storageBucket: "{{ firebase_project_id }}.firebasestorage.app",
+            appId: "{{ firebase_app_id }}",
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        let currentStudyPlan = null;
+
+        // Auth state observer
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    const idToken = await user.getIdToken();
+                    await verifyToken(idToken);
+                    await loadStudyPlan();
+                } catch (error) {
+                    console.error('Authentication error:', error);
+                    window.location.href = '/';
+                }
+            } else {
+                window.location.href = '/';
+            }
+        });
+
+        // Event listeners
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+        document.getElementById('exportBtn').addEventListener('click', exportPlan);
+        document.getElementById('regenerateBtn').addEventListener('click', regeneratePlan);
+
+        async function verifyToken(idToken) {
+            const response = await fetch('/api/verify-token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ idToken })
+            });
+            if (!response.ok) throw new Error('Token verification failed');
+        }
+
+        async function loadStudyPlan() {
+            try {
+                const response = await fetch('/api/user-data');
+                if (!response.ok) throw new Error('Failed to load user data');
+                
+                const data = await response.json();
+                currentStudyPlan = data.study_plan;
+                
+                if (currentStudyPlan) {
+                    displayStudyPlan(currentStudyPlan);
+                    document.getElementById('mainContent').classList.remove('d-none');
+                } else {
+                    document.getElementById('noPlanState').classList.remove('d-none');
+                }
+            } catch (error) {
+                console.error('Error loading study plan:', error);
+                document.getElementById('noPlanState').classList.remove('d-none');
+            } finally {
+                document.getElementById('loadingState').classList.add('d-none');
+            }
+        }
+
+        function displayStudyPlan(plan) {
+            // Update statistics
+            document.getElementById('totalTopics').textContent = plan.total_topics || 0;
+            
+            // Calculate total time
+            let totalTime = 0;
+            Object.values(plan.daily_schedule || {}).forEach(day => {
+                totalTime += day.total_time || 0;
+            });
+            document.getElementById('totalTime').textContent = `${totalTime}h`;
+            
+            // Set generated date
+            const generatedDate = new Date(plan.generated_at).toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric' 
+            });
+            document.getElementById('generatedDate').textContent = generatedDate;
+
+            // Display daily schedule
+            displayDailySchedule(plan.daily_schedule || {});
+        }
+
+        function displayDailySchedule(schedule) {
+            const container = document.getElementById('dailySchedule');
+            container.innerHTML = '';
+
+            Object.entries(schedule).forEach(([dayKey, dayData]) => {
+                const dayNumber = dayKey.split('_')[1];
+                const dayElement = createDayElement(dayNumber, dayData);
+                container.appendChild(dayElement);
+            });
+        }
+
+        function createDayElement(dayNumber, dayData) {
+            const dayDiv = document.createElement('div');
+            dayDiv.className = 'day-schedule mb-4';
+
+            const hasTopics = dayData.topics && dayData.topics.length > 0;
+            const focusAreas = dayData.focus_areas || [];
+
+            dayDiv.innerHTML = `
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-calendar-day text-primary me-2"></i>
+                                    Day ${dayNumber} - ${dayData.day_name}
+                                </h6>
+                                <small class="text-muted">${dayData.date}</small>
+                            </div>
+                            <div class="col-md-6 text-md-end">
+                                <span class="badge bg-primary me-2">
+                                    ${dayData.topics ? dayData.topics.length : 0} topics
+                                </span>
+                                <span class="badge bg-success">
+                                    ${dayData.total_time || 0}h study time
+                                </span>
+                            </div>
+                        </div>
+                        ${focusAreas.length > 0 ? `
+                            <div class="mt-2">
+                                <small class="text-warning">
+                                    <i class="fas fa-star me-1"></i>Focus Areas: ${focusAreas.join(', ')}
+                                </small>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="card-body">
+                        ${hasTopics ? createTopicsContent(dayData.topics) : createEmptyDayContent()}
+                    </div>
+                </div>
+            `;
+
+            return dayDiv;
+        }
+
+        function createTopicsContent(topics) {
+            return topics.map(topic => `
+                <div class="topic-item mb-3 p-3 border rounded">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h6 class="mb-1">
+                                ${topic.name}
+                                <span class="badge ${getSkillBadgeClass(topic.current_skill_level)} ms-2">
+                                    Level ${topic.current_skill_level}/5
+                                </span>
+                            </h6>
+                            <p class="text-muted small mb-2">${topic.study_approach}</p>
+                            
+                            ${topic.recommended_problems && topic.recommended_problems.length > 0 ? `
+                                <div class="mb-2">
+                                    <strong class="small">Practice Problems:</strong>
+                                    <div class="mt-1">
+                                        ${topic.recommended_problems.map(problem => `
+                                            <span class="badge bg-secondary me-1 mb-1">${problem}</span>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <div class="d-flex flex-column align-items-md-end">
+                                <span class="badge bg-info mb-2">
+                                    <i class="fas fa-clock me-1"></i>${topic.estimated_time}h
+                                </span>
+                                <small class="text-muted">
+                                    Priority: ${topic.priority_score}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function createEmptyDayContent() {
+            return `
+                <div class="text-center text-muted py-3">
+                    <i class="fas fa-coffee fa-2x mb-2"></i>
+                    <p class="mb-0">Free day - Review previous topics or take a break!</p>
+                </div>
+            `;
+        }
+
+        function getSkillBadgeClass(level) {
+            if (level <= 2) return 'bg-danger';
+            if (level <= 3) return 'bg-warning';
+            return 'bg-success';
+        }
+
+        async function regeneratePlan() {
+            if (!confirm('Are you sure you want to regenerate your study plan? This will create a new plan based on your current topic ratings.')) {
+                return;
+            }
+
+            try {
+                showLoading();
+                
+                const response = await fetch('/api/generate-plan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to regenerate study plan');
+                }
+                
+                const result = await response.json();
+                currentStudyPlan = result.plan;
+                
+                displayStudyPlan(currentStudyPlan);
+                hideLoading();
+                showSuccessAlert('Study plan regenerated successfully!');
+                
+            } catch (error) {
+                hideLoading();
+                console.error('Error regenerating study plan:', error);
+                showErrorAlert(error.message || 'Failed to regenerate study plan');
+            }
+        }
+
+        function exportPlan() {
+            if (!currentStudyPlan) {
+                showErrorAlert('No study plan to export');
+                return;
+            }
+
+            const planText = formatPlanForExport(currentStudyPlan);
+            const blob = new Blob([planText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `DSA_Study_Plan_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showSuccessAlert('Study plan exported successfully!');
+        }
+
+        function formatPlanForExport(plan) {
+            let text = `DSA Study Plan - Generated on ${new Date(plan.generated_at).toLocaleDateString()}\n`;
+            text += `Total Topics: ${plan.total_topics}\n`;
+            text += `Duration: ${plan.plan_duration}\n\n`;
+            text += '='.repeat(50) + '\n\n';
+
+            Object.entries(plan.daily_schedule || {}).forEach(([dayKey, dayData]) => {
+                const dayNumber = dayKey.split('_')[1];
+                text += `DAY ${dayNumber} - ${dayData.day_name} (${dayData.date})\n`;
+                text += `Study Time: ${dayData.total_time}h\n`;
+                
+                if (dayData.focus_areas && dayData.focus_areas.length > 0) {
+                    text += `Focus Areas: ${dayData.focus_areas.join(', ')}\n`;
+                }
+                
+                text += '\nTopics:\n';
+                
+                if (dayData.topics && dayData.topics.length > 0) {
+                    dayData.topics.forEach((topic, index) => {
+                        text += `${index + 1}. ${topic.name} (${topic.estimated_time}h)\n`;
+                        text += `   Skill Level: ${topic.current_skill_level}/5\n`;
+                        text += `   Approach: ${topic.study_approach}\n`;
+                        
+                        if (topic.recommended_problems && topic.recommended_problems.length > 0) {
+                            text += `   Problems: ${topic.recommended_problems.join(', ')}\n`;
+                        }
+                        text += '\n';
+                    });
+                } else {
+                    text += '   Free day - Review or rest\n\n';
+                }
+                
+                text += '-'.repeat(30) + '\n\n';
+            });
+
+            return text;
+        }
+
+        async function logout() {
+            try {
+                await signOut(auth);
+                await fetch('/api/logout', { method: 'POST' });
+                window.location.href = '/';
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+
+        function showLoading() {
+            document.getElementById('regenerateBtn').innerHTML = `
+                <span class="spinner-border spinner-border-sm me-1"></span>Generating...
+            `;
+            document.getElementById('regenerateBtn').disabled = true;
+        }
+
+        function hideLoading() {
+            document.getElementById('regenerateBtn').innerHTML = `
+                <i class="fas fa-sync-alt me-1"></i>Regenerate
+            `;
+            document.getElementById('regenerateBtn').disabled = false;
+        }
+
+        function showSuccessAlert(message) {
+            showAlert(message, 'success');
+        }
+
+        function showErrorAlert(message) {
+            showAlert(message, 'danger');
+        }
+
+        function showAlert(message, type) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            alert.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

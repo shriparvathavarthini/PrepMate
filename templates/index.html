@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA Study Planner - Personalized Learning Path</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="fas fa-code me-2"></i>DSA Study Planner
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <div class="hero-content">
+                    <h1 class="display-4 fw-bold mb-4">
+                        Master Data Structures & Algorithms
+                    </h1>
+                    <p class="lead mb-5">
+                        Get personalized 7-day study plans tailored to your skill level using intelligent algorithms.
+                        Track your progress and optimize your learning journey.
+                    </p>
+                    
+                    <!-- Login Section -->
+                    <div class="card mx-auto" style="max-width: 400px;">
+                        <div class="card-body p-4">
+                            <h5 class="card-title mb-3">Get Started</h5>
+                            <p class="text-muted mb-4">Sign in with Google to create your personalized study plan</p>
+                            
+                            <button id="loginBtn" class="btn btn-primary btn-lg w-100 mb-3">
+                                <i class="fab fa-google me-2"></i>Sign in with Google
+                            </button>
+                            
+                            <div id="loadingState" class="d-none">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2 text-muted">Signing you in...</p>
+                            </div>
+                            
+                            <div id="domainError" class="alert alert-warning mt-3 d-none">
+                                <h6><i class="fas fa-exclamation-triangle me-2"></i>Domain Not Authorized</h6>
+                                <p class="mb-2">To enable Google sign-in, please add this domain to your Firebase project:</p>
+                                <div class="bg-dark p-2 rounded mb-2">
+                                    <code id="currentDomain" class="text-light"></code>
+                                </div>
+                                <small>Go to Firebase Console → Authentication → Settings → Authorized domains</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Features Section -->
+        <div class="row mt-5">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-brain fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Smart Algorithm</h5>
+                        <p class="card-text">
+                            Our greedy algorithm prioritizes topics based on your skill gaps for optimal learning efficiency.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-calendar-alt fa-3x text-success mb-3"></i>
+                        <h5 class="card-title">7-Day Plans</h5>
+                        <p class="card-text">
+                            Structured weekly study plans with daily topics, practice problems, and time estimates.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-chart-line fa-3x text-info mb-3"></i>
+                        <h5 class="card-title">Progress Tracking</h5>
+                        <p class="card-text">
+                            Monitor your improvement across different topics and adjust your learning path accordingly.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Configuration -->
+    <script>
+        window.firebaseConfig = {
+            apiKey: "{{ firebase_api_key }}",
+            authDomain: "{{ firebase_project_id }}.firebaseapp.com",
+            projectId: "{{ firebase_project_id }}",
+            storageBucket: "{{ firebase_project_id }}.firebasestorage.app",
+            appId: "{{ firebase_app_id }}",
+        };
+    </script>
+
+    <!-- Firebase SDK -->
+    <script type="module">{% raw %}
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js';
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js';
+
+        const firebaseConfig = window.firebaseConfig;
+
+        // Check if Firebase config is properly loaded
+        console.log("Firebase Config:", firebaseConfig);
+        
+        // Validate Firebase configuration
+        if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes("{{")) {
+            console.error("Firebase configuration not loaded properly");
+            showError("Firebase configuration error. Please check your environment variables.");
+            throw new Error("Invalid Firebase configuration");
+        }
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        // Check if user is already signed in
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                handleAuthSuccess(user);
+            }
+        });
+
+        // Login button handler - using popup instead of redirect
+        document.getElementById('loginBtn').addEventListener('click', async () => {
+            showLoading();
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                await handleAuthSuccess(user);
+            } catch (error) {
+                console.error("Authentication error:", error);
+                hideLoading();
+                
+                // Handle specific authentication errors
+                if (error.code === "auth/unauthorized-domain") {
+                    showDomainError();
+                } else if (error.code === "auth/popup-blocked") {
+                    showError("Popup was blocked by your browser. Please allow popups and try again.");
+                } else if (error.code === "auth/popup-closed-by-user") {
+                    showError("Sign-in was cancelled.");
+                } else {
+                    showError("Authentication failed. Please try again.");
+                }
+            }
+        });
+
+        async function handleAuthSuccess(user) {
+            try {
+                const idToken = await user.getIdToken();
+                
+                const response = await fetch("/api/verify-token", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ idToken: idToken })
+                });
+                
+                if (response.ok) {
+                    window.location.href = "/dashboard";
+                } else {
+                    throw new Error("Token verification failed");
+                }
+            } catch (error) {
+                console.error("Authentication error:", error);
+                hideLoading();
+                showError("Authentication failed. Please try again.");
+            }
+        }
+
+        function showLoading() {
+            document.getElementById("loginBtn").classList.add("d-none");
+            document.getElementById("loadingState").classList.remove("d-none");
+        }
+
+        function hideLoading() {
+            document.getElementById("loginBtn").classList.remove("d-none");
+            document.getElementById("loadingState").classList.add("d-none");
+        }
+
+        function showDomainError() {
+            const domainErrorDiv = document.getElementById("domainError");
+            const currentDomainCode = document.getElementById("currentDomain");
+            
+            // Get current domain
+            currentDomainCode.textContent = window.location.hostname;
+            domainErrorDiv.classList.remove("d-none");
+        }
+
+        function showError(message) {
+            const errorDiv = document.createElement("div");
+            errorDiv.className = "alert alert-danger mt-3";
+            errorDiv.textContent = message;
+            document.querySelector(".card-body").appendChild(errorDiv);
+            
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+    {% endraw %}</script>
+</body>
+</html>
