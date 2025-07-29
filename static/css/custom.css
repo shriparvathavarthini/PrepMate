@@ -1,0 +1,381 @@
+/* Custom styles for DSA Study Planner */
+
+/* Theme consistency */
+:root {
+    --primary-gradient: linear-gradient(135deg, var(--bs-primary), var(--bs-info));
+    --card-hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    --transition-smooth: all 0.3s ease;
+}
+
+/* Global improvements */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+}
+
+/* Navigation enhancements */
+.navbar {
+    background: var(--primary-gradient) !important;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.navbar-brand {
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+/* Card enhancements */
+.card {
+    border: none;
+    border-radius: 12px;
+    transition: var(--transition-smooth);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--card-hover-shadow);
+}
+
+/* Hero section */
+.hero-content {
+    padding: 2rem 0;
+}
+
+.hero-content .card {
+    background: rgba(var(--bs-body-bg-rgb), 0.8);
+    backdrop-filter: blur(10px);
+}
+
+/* Action cards */
+.action-card {
+    height: 100%;
+    transition: var(--transition-smooth);
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--card-hover-shadow);
+}
+
+.action-card i {
+    transition: var(--transition-smooth);
+}
+
+.action-card:hover i {
+    transform: scale(1.1);
+}
+
+/* Topic selection */
+.topic-card {
+    transition: var(--transition-smooth);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.topic-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.topic-card:hover::before {
+    left: 100%;
+}
+
+.topic-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--card-hover-shadow);
+}
+
+/* Rating stars */
+.rating-stars {
+    font-size: 1.5rem;
+    line-height: 1;
+    margin: 0.5rem 0;
+}
+
+.rating-stars .star {
+    color: var(--bs-secondary);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    margin: 0 2px;
+    user-select: none;
+}
+
+.rating-stars .star:hover,
+.rating-stars .star.active {
+    color: var(--bs-warning);
+    transform: scale(1.1);
+}
+
+.rating-stars .star:hover {
+    text-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+}
+
+/* Topic rating cards on dashboard */
+.topic-rating-card {
+    border-left: 4px solid var(--bs-primary);
+    transition: var(--transition-smooth);
+}
+
+.topic-rating-card:hover {
+    border-left-color: var(--bs-warning);
+    transform: translateX(5px);
+}
+
+/* Study plan */
+.plan-header {
+    background: var(--primary-gradient);
+    color: white;
+    margin-bottom: 1.5rem;
+}
+
+.plan-header .card-body {
+    padding: 2rem;
+}
+
+.stat-card {
+    text-align: center;
+    transition: var(--transition-smooth);
+    border-top: 3px solid transparent;
+}
+
+.stat-card:hover {
+    border-top-color: var(--bs-primary);
+    transform: translateY(-3px);
+}
+
+.day-schedule {
+    margin-bottom: 1.5rem;
+}
+
+.day-schedule .card-header {
+    background: rgba(var(--bs-primary-rgb), 0.1);
+    border-bottom: 2px solid var(--bs-primary);
+}
+
+.topic-item {
+    background: rgba(var(--bs-body-bg-rgb), 0.5);
+    border: 1px solid rgba(var(--bs-border-color-rgb), 0.3) !important;
+    transition: var(--transition-smooth);
+}
+
+.topic-item:hover {
+    background: rgba(var(--bs-primary-rgb), 0.1);
+    border-color: var(--bs-primary) !important;
+    transform: translateX(10px);
+}
+
+/* Badges and tags */
+.badge {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+}
+
+/* Filter buttons */
+.filter-btn {
+    transition: var(--transition-smooth);
+    border-radius: 20px;
+}
+
+.filter-btn.active {
+    background: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: white;
+    box-shadow: 0 2px 8px rgba(var(--bs-primary-rgb), 0.3);
+}
+
+/* Loading states */
+.spinner-border {
+    animation-duration: 0.8s;
+}
+
+/* Welcome card */
+.welcome-card {
+    background: var(--primary-gradient);
+    color: white;
+    margin-bottom: 2rem;
+}
+
+.page-header {
+    background: rgba(var(--bs-primary-rgb), 0.1);
+    border: 1px solid rgba(var(--bs-primary-rgb), 0.2);
+    margin-bottom: 2rem;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .hero-content {
+        padding: 1rem 0;
+    }
+    
+    .hero-content .display-4 {
+        font-size: 2rem;
+    }
+    
+    .stat-card {
+        margin-bottom: 1rem;
+    }
+    
+    .topic-item:hover {
+        transform: none;
+    }
+    
+    .filter-btn {
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Animation utilities */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Accessibility improvements */
+.btn:focus,
+.form-control:focus,
+.star:focus {
+    box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.25);
+    outline: none;
+}
+
+/* Print styles */
+@media print {
+    .navbar,
+    .btn,
+    .badge {
+        display: none !important;
+    }
+    
+    .card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+    
+    .topic-item {
+        break-inside: avoid;
+    }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bs-body-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--bs-secondary);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--bs-primary);
+}
+
+/* Form enhancements */
+.form-control {
+    border-radius: 8px;
+    transition: var(--transition-smooth);
+}
+
+.form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.1);
+}
+
+.input-group-text {
+    border-radius: 8px 0 0 8px;
+    background: rgba(var(--bs-primary-rgb), 0.1);
+    border-color: var(--bs-primary);
+    color: var(--bs-primary);
+}
+
+/* Success and error states */
+.alert {
+    border-radius: 10px;
+    border: none;
+    backdrop-filter: blur(10px);
+}
+
+.alert-success {
+    background: rgba(var(--bs-success-rgb), 0.1);
+    color: var(--bs-success);
+}
+
+.alert-danger {
+    background: rgba(var(--bs-danger-rgb), 0.1);
+    color: var(--bs-danger);
+}
+
+/* Modal enhancements */
+.modal-content {
+    border-radius: 15px;
+    border: none;
+    backdrop-filter: blur(10px);
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(var(--bs-border-color-rgb), 0.2);
+    border-radius: 15px 15px 0 0;
+}
+
+/* Button enhancements */
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: var(--transition-smooth);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s ease, height 0.3s ease;
+}
+
+.btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-primary {
+    background: var(--primary-gradient);
+    border: none;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(var(--bs-primary-rgb), 0.3);
+}

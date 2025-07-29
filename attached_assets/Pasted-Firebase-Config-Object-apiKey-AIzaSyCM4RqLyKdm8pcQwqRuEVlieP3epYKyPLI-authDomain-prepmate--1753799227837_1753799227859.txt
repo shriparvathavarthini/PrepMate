@@ -1,0 +1,14 @@
+Firebase Config: 
+Object {apiKey: "AIzaSyCM4RqLyKdm8pcQwqRuEVlieP3epYKyPLI", authDomain: "prepmate-2dfa5.firebaseapp.com", projectId: "prepmate-2dfa5", storageBucket: "prepmate-2dfa5.firebasestorage.app", appId: "1:1001637355899:web:21b94953cd1c820d211dde"}
+Authentication error: 
+FirebaseError {code: "auth/operation-not-allowed", customData: {…}, name: "FirebaseError"}
+code: "auth/operation-not-allowed"
+customData: Object
+name: "FirebaseError"
+message: "Firebase: Error (auth/operation-not-allowed)."
+stack: "FirebaseError: Firebase: Error (auth/operation-not-allowed).↵ at createErrorInternal (https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js:1:29119)↵ at _createError (https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js:1:28270)↵ at AuthEventManager.sendToConsumer (https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js:1:137359)↵ at https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js:1:136845↵ at Set.forEach (<anonymous>)↵ at AuthEventManager.onEvent (https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js:1:136791)↵ at _.vn.<anonymous> (https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js:1:144492)↵ at Rm (https://apis.google.com/_/scs/abc-static/_/js/k=gapi.lb.en.iFs_Bhrqdio.O/m=gapi_iframes/rt=j/sv=1/d=1/ed=1/rs=AHpOoo-IvlQWaLHZdUKQFbafXd_3OEvU9Q/cb=gapi.loaded_0?le=scs:194:287)↵ at Object.<anonymous> (https://apis.google.com/_/scs/abc-static/_/js/k=gapi.lb.en.iFs_Bhrqdio.O/m=gapi_iframes/rt=j/sv=1/d=1/ed=1/rs=AHpOoo-IvlQWaLHZdUKQFbafXd_3OEvU9Q/cb=gapi.loaded_0?le=scs:194:460)↵ at gl (https://apis.google.com/_/scs/abc-static/_/js/k=gapi.lb.en.iFs_Bhrqdio.O/m=gapi_iframes/rt=j/sv=1/d=1/ed=1/rs=AHpOoo-IvlQWaLHZdUKQFbafXd_3OEvU9Q/cb=gapi.loaded_0?le=scs:173:307)"
+get stack: ƒ ()
+set stack: ƒ ()
+[[Prototype]]: Object
+constructor: ƒ class FirebaseError extends Error{constructor(e,t,r){super(t),this.code=e,this.customData=r,this.name="FirebaseError",Object.setPrototypeOf(this,FirebaseError.prototype),Error.captureStackTrace&&Error.captureStackTrace(this,ErrorFactory.prototype.create)}}
+[[Prototype]]: Object
